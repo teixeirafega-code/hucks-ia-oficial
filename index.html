@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hucks IA - Gerador de Milhões</title>
+    <style>
+        :root { --primary: #6366f1; --bg: #030712; --card: #0f172a; --success: #10b981; --accent: #a855f7; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; padding: 20px; margin: 0; min-height: 100vh; }
+        .container { background: var(--card); width: 100%; max-width: 550px; padding: 30px; border-radius: 24px; border: 1px solid #1e293b; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); align-self: center; }
+        h1 { text-align: center; font-size: 2.2rem; margin-bottom: 5px; font-weight: 800; letter-spacing: -1px; }
+        .status-bar { text-align: center; font-size: 11px; margin-bottom: 20px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 10px; font-size: 14px; color: #94a3b8; text-align: center; }
+        input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #334155; background: #1e293b; color: white; box-sizing: border-box; outline: none; transition: 0.3s; font-size: 16px; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+        .btn-main { width: 100%; padding: 16px; font-size: 16px; font-weight: 700; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-main:hover { background: #4f46e5; transform: translateY(-1px); }
+        .btn-main:disabled { background: #334155; cursor: not-allowed; opacity: 0.6; }
+        .result-section { margin-top: 30px; display: none; }
+        .info-label { font-size: 12px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .content-box { background: rgba(30, 41, 59, 0.5); padding: 18px; border-radius: 14px; font-size: 15px; line-height: 1.6; margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.05); border-left: 5px solid var(--primary); color: #cbd5e1; white-space: pre-wrap; }
+        .diag-text { color: #4ade80; } 
+        #diag-content { border-left-color: #4ade80; }
+        .copy-text { color: #facc15; } 
+        #copy-sample { border-left-color: #facc15; }
+        .img-text { color: #a855f7; } 
+        #img-details { border-left-color: #a855f7; }
+        .locked-content { display: none; position: relative; filter: blur(4px); opacity: 0.5; user-select: none; pointer-events: none; background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #334155; }
+        .lock-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; font-size: 24px; filter: none !important; opacity: 1 !important; }
+        .cta-card { display: none; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 25px; border-radius: 18px; text-align: center; margin-top: 15px; }
+        .btn-white { background: white; color: black; border: none; padding: 12px 24px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px; }
+        .auth-modal { display: none; margin-top: 20px; padding: 20px; background: #111827; border-radius: 15px; border: 1px solid #334155; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="status-bar" id="status">Iniciando sistema...</div>
+    <h1>Hucks IA</h1>
+
+    <div class="input-group">
+        <label>Insira o seu produto para um diagnóstico de risco gratuito.</label>
+        <input id="produto" placeholder="Ex: Bolo de Pote, Curso de Inglês...">
+    </div>
+
+    <button id="btn-gerar" class="btn-main" disabled>
+        <span>✨</span> Gerar Diagnóstico Seguro
+    </button>
+
+    <div id="result-area" class="result-section">
+        <div class="info-label diag-text">⚠️ Diagnóstico de Risco</div>
+        <div id="diag-content" class="content-box">Analisando...</div>
+
+        <div class="info-label copy-text">✍️ Copy Base (Amostra)</div>
+        <div id="copy-sample" class="content-box">Gerando...</div>
+
+        <div class="info-label img-text">🎨 Sugestão de Imagem/Criativo</div>
+        <div id="img-details" class="content-box">Descrevendo...</div>
+
+        <div class="locked-content" id="locked-area">
+            <div class="lock-icon">🔒</div>
+            Copy Completa: <br> Aqui vai o texto validado com gatilhos...
+        </div>
+
+        <div id="pay-btn-area" class="cta-card">
+            <h3 style="margin-top:0">🔑 Quer desbloquear a copy completa?</h3>
+            <button id="btn-pagar" class="btn-white">Comprar 10 Créditos</button>
+        </div>
+
+        <p id="saldo-txt" style="text-align: right; font-size: 12px; color: #64748b; margin-top: 10px; display: none;">
+            Saldo: <strong id="creditos">0</strong> créditos
+        </p>
+    </div>
+
+    <div id="auth-area" class="auth-modal">
+        <h3 style="text-align: center; margin-bottom: 15px;">Acesse a sua conta</h3>
+        <input id="email" type="email" placeholder="E-mail" style="margin-bottom: 10px;">
+        <input id="senha" type="password" placeholder="Senha" style="margin-bottom: 15px;">
+        <div style="display: flex; gap: 10px;">
+            <button id="btn-entrar" class="btn-main" style="background: #334155; font-size: 14px;">Entrar</button>
+            <button id="btn-cadastrar" class="btn-main" style="background: transparent; border: 1px solid var(--primary); font-size: 14px;">Cadastrar</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const API = window.location.hostname.includes("localhost") ? "http://localhost:3001" : "https://therux-backend.onrender.com";
+    let auth;
+
+    async function init() {
+        const status = document.getElementById("status");
+        try {
+            const res = await fetch(`${API}/api/config`);
+            const config = await res.json();
+            const app = initializeApp(config);
+            auth = getAuth(app);
+
+            status.innerText = "● Sistema Pronto";
+            status.style.color = "#4ade80";
+            document.getElementById("btn-gerar").disabled = false;
+
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    document.getElementById("auth-area").style.display = "none";
+                    document.getElementById("saldo-txt").style.display = "block";
+                    fetchCreditos(user);
+                }
+            });
+        } catch (e) {
+            status.innerText = "● Erro de conexão...";
+            console.error(e);
+        }
+    }
+
+    async function fetchCreditos(user) {
+        const token = await user.getIdToken();
+        const res = await fetch(`${API}/api/anuncio`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify({ produto: "" })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            document.getElementById("creditos").innerText = data.creditosRestantes;
+        }
+    }
+
+    async function gerar() {
+        const prod = document.getElementById("produto").value;
+        if (!prod) return alert("Digite o produto!");
+
+        const btn = document.getElementById("btn-gerar");
+        const resArea = document.getElementById("result-area");
+        
+        btn.disabled = true;
+        btn.innerText = "⌛ Analisando...";
+
+        try {
+            const user = auth?.currentUser;
+            if (!user) {
+                document.getElementById("auth-area").style.display = "block";
+                btn.disabled = false;
+                btn.innerText = "✨ Gerar Diagnóstico Seguro";
+                return;
+            }
+
+            const token = await user.getIdToken();
+            const res = await fetch(`${API}/api/anuncio`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                body: JSON.stringify({ produto: prod })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                resArea.style.display = "block";
+                const partes = data.resultado.split("|||");
+                document.getElementById("diag-content").innerText = partes[0]?.trim() || "Sem diagnóstico.";
+                document.getElementById("copy-sample").innerText = partes[1]?.trim() || "Sem copy.";
+                document.getElementById("img-details").innerText = partes[2]?.trim() || "Sem sugestão de imagem.";
+                document.getElementById("creditos").innerText = data.creditosRestantes;
+
+                if(data.creditosRestantes <= 0){
+                    document.getElementById("locked-area").style.display = "block";
+                    document.getElementById("pay-btn-area").style.display = "block";
+                } else {
+                    document.getElementById("locked-area").style.display = "none";
+                    document.getElementById("pay-btn-area").style.display = "none";
+                }
+            } else {
+                alert(data.erro || "Erro ao gerar.");
+            }
+        } catch(e) {
+            alert("Erro de conexão com o servidor.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "✨ Gerar Diagnóstico Seguro";
+        }
+    }
+
+    document.getElementById("btn-pagar").onclick = async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("Faça login primeiro.");
+        try {
+            const token = await user.getIdToken();
+            const res = await fetch(`${API}/api/pagamento`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            });
+            const data = await res.json();
+            if(data.checkout_url) window.open(data.checkout_url, "_blank");
+            else alert("Erro ao gerar link de pagamento.");
+        } catch (e) {
+            alert("Erro ao processar pagamento.");
+        }
+    };
+
+    document.getElementById("btn-entrar").onclick = () => {
+        const email = document.getElementById("email").value;
+        const senha = document.getElementById("senha").value;
+        signInWithEmailAndPassword(auth, email, senha).catch(err => alert("Erro: " + err.message));
+    };
+    document.getElementById("btn-cadastrar").onclick = () => {
+        const email = document.getElementById("email").value;
+        const senha = document.getElementById("senha").value;
+        createUserWithEmailAndPassword(auth, email, senha).catch(err => alert("Erro: " + err.message));
+    };
+
+    document.getElementById("btn-gerar").onclick = gerar;
+    init();
+</script>
+</body>
+</html>
