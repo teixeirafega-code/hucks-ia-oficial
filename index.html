@@ -3,23 +3,21 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Hucks IA — Diagnóstico de Anúncios</title>
+<title>Tilápia IA — Evite Anúncios Errados</title>
 
 <style>
 :root{
   --bg:#020617;
-  --card:#0f172a;
   --primary:#6366f1;
   --accent:#a855f7;
   --danger:#f97316;
-  --success:#22c55e;
 }
 *{box-sizing:border-box}
 body{
   margin:0;
   min-height:100vh;
   background:radial-gradient(circle at top,#020617,#000);
-  font-family:Inter,system-ui,sans-serif;
+  font-family:system-ui;
   color:#e5e7eb;
   display:flex;
   align-items:center;
@@ -27,26 +25,20 @@ body{
 }
 .container{
   width:100%;
-  max-width:520px;
-  background:linear-gradient(180deg,#020617,#020617cc);
+  max-width:560px;
+  background:#020617;
   border:1px solid #1e293b;
   border-radius:22px;
   padding:28px;
-  box-shadow:0 30px 80px rgba(0,0,0,.6);
 }
-h1{
-  text-align:center;
-  margin:0 0 8px;
-  font-size:2rem;
-  font-weight:800;
-}
+h1{text-align:center;margin:0 0 6px}
 .sub{
   text-align:center;
   font-size:13px;
   color:#94a3b8;
-  margin-bottom:24px;
+  margin-bottom:22px;
 }
-input{
+input,button{
   width:100%;
   padding:16px;
   border-radius:12px;
@@ -56,31 +48,18 @@ input{
   font-size:15px;
 }
 button{
-  width:100%;
   margin-top:14px;
-  padding:16px;
   border:none;
-  border-radius:14px;
-  font-size:15px;
-  font-weight:700;
+  font-weight:800;
   cursor:pointer;
   background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:white;
 }
-button:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
-.section{
-  margin-top:26px;
-  display:none;
-}
+.section{margin-top:26px;display:none}
 .label{
   font-size:12px;
-  letter-spacing:.08em;
   text-transform:uppercase;
   font-weight:800;
-  margin-bottom:8px;
+  margin-bottom:6px;
 }
 .box{
   background:#020617;
@@ -88,160 +67,257 @@ button:disabled{
   border-left:5px solid var(--primary);
   border-radius:14px;
   padding:16px;
-  margin-bottom:18px;
-  line-height:1.55;
-  font-size:14px;
+  margin-bottom:14px;
   white-space:pre-wrap;
 }
 .risk{border-left-color:var(--danger)}
-.sample{border-left-color:#facc15}
-.premium{border-left-color:var(--accent)}
-.blur{
-  filter:blur(5px);
-  opacity:.55;
-  user-select:none;
-  pointer-events:none;
-}
-.paywall{
-  margin-top:22px;
-  background:linear-gradient(135deg,#4f46e5,#7c3aed);
-  padding:22px;
-  border-radius:18px;
-  text-align:center;
+.blur{filter:blur(6px);opacity:.5}
+
+.login-cta{
   display:none;
+  margin-top:16px;
 }
-.paywall h3{margin:0 0 10px}
-.paywall p{font-size:14px;opacity:.9}
+.login-cta button{
+  background:transparent;
+  border:1px dashed #6366f1;
+  font-weight:800;
+}
+
+.paywall{
+  display:none;
+  margin-top:18px;
+  background:linear-gradient(135deg,#4f46e5,#7c3aed);
+  padding:18px;
+  border-radius:14px;
+  text-align:center;
+}
+.paywall p{
+  font-size:14px;
+  margin:0 0 12px;
+}
 .paywall button{
-  background:white;
-  color:black;
-  margin-top:14px;
+  background:#fff;
+  color:#000;
+  font-weight:900;
 }
+
 .footer{
-  text-align:right;
   font-size:11px;
   color:#94a3b8;
-  margin-top:8px;
+  text-align:right;
 }
 </style>
 </head>
 
 <body>
 <div class="container">
-  <h1>Hucks IA</h1>
-  <div class="sub">Descubra onde você está prestes a perder dinheiro em anúncios.</div>
+  <h1>Tilápia IA</h1>
+  <div class="sub">
+    90% das pessoas erram isso em anúncios.<br>
+    Descubra antes de perder dinheiro.
+  </div>
 
-  <input id="produto" placeholder="Ex: Bolo de Pote, Curso de Inglês"/>
-  <button id="gerar">✨ Gerar Diagnóstico Seguro</button>
+  <input id="produto" placeholder="Ex: Bolo de pote, Curso de inglês, Manicure em domicílio"/>
+  <button id="gerar">🧠 Gerar diagnóstico (1 tentativa grátis)</button>
 
   <div id="resultado" class="section">
-    <div class="label">⚠️ Diagnóstico de Risco</div>
-    <div id="diag" class="box risk"></div>
 
-    <div class="label">✍️ Copy Base (Amostra)</div>
-    <div id="sample" class="box sample"></div>
+    <div class="label">⚠️ Seu risco agora</div>
+    <div id="diagnostico" class="box risk"></div>
 
-    <div class="label">🔒 Estratégia Completa</div>
-    <div class="box premium blur">
-      Texto de alta persuasão  
-      Público-alvo específico  
-      Ângulo emocional correto  
-      Imagem ideal + CTA certo
+    <div class="label">💸 Impacto real</div>
+    <div id="impacto" class="box"></div>
+
+    <div class="label">👥 Público-alvo específico</div>
+    <div id="publico" class="box blur"></div>
+
+    <div class="label">😢 Ângulo emocional</div>
+    <div id="angulo" class="box blur"></div>
+
+    <div class="label">🖼️ Imagem ideal (descrição)</div>
+    <div id="imagem" class="box blur"></div>
+
+    <div class="label">✍️ Texto de anúncio (pessoa → pessoa)</div>
+    <div id="copy" class="box blur"></div>
+
+    <div class="label">📞 CTAs variados pro funil</div>
+    <div id="ctas" class="box blur"></div>
+
+    <!-- LOGIN CTA -->
+    <div class="login-cta" id="loginCtaWrapper">
+      <button id="loginCta">
+        🔐 Entre para continuar evitando erros
+                (recarregue ao logar)
+      </button>
     </div>
 
-    <div id="paywall" class="paywall">
-      <h3>🔑 Quase lá…</h3>
+    <!-- PAYWALL -->
+    <div class="paywall" id="paywall">
       <p>
-        Você já viu onde está errando.<br>
-        Agora falta a versão que <b>reduz o risco de perder dinheiro</b>.
+        Cada crédito é <b>uma tentativa de não perder dinheiro</b>.<br><br>
+        Continue com clareza total e redução de erros caros.
       </p>
-      <button id="comprar">Comprar 10 Créditos</button>
+      <button id="comprar">
+        💳 Pacote com 10 créditos apenas R$7,99
+      </button>
     </div>
 
     <div class="footer">
-      Saldo: <b><span id="creditos">1</span></b> créditos
+      Saldo: <b><span id="creditos">1</span></b> crédito
     </div>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const API = location.hostname.includes("localhost")
   ? "http://localhost:3001"
   : "https://therux-backend.onrender.com";
 
 let auth;
-let creditos = 1;
+let token = null;
+let creditos = 1;      // Valor inicial presumido para não-logados
+let gerou = false;
 
-// Inicializa Firebase para pegar o Token do usuário logado
-async function startApp() {
-    try {
-        const res = await fetch(`${API}/api/config`);
-        const config = await res.json();
-        const app = initializeApp(config);
-        auth = getAuth(app);
-    } catch (e) {
-        console.error("Erro ao carregar config da API");
+async function start() {
+  const res = await fetch(`${API}/api/config`);
+  const config = await res.json();
+  auth = getAuth(initializeApp(config));
+
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      token = await user.getIdToken();
+      const resCred = await fetch(`${API}/api/creditos`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await resCred.json();
+      creditos = data.creditos;
+      document.getElementById("creditos").innerText = creditos;
+    } else {
+      creditos = 1;
+      document.getElementById("creditos").innerText = "1 (grátis)";
     }
+    updateUI();
+  });
 }
-startApp();
+start();
 
-document.getElementById("gerar").onclick = async () => {
-  const produto = document.getElementById("produto").value;
-  if (!produto) return alert("Digite o produto");
+function updateUI() {
+  const logged = !!auth.currentUser;
 
-  document.getElementById("resultado").style.display = "block";
+  document.getElementById("creditos").innerText = logged ? creditos : "1 (grátis)";
 
-  if (creditos <= 0) {
-    document.getElementById("paywall").style.display = "block";
+  const loginWrapper = document.getElementById("loginCtaWrapper");
+  const paywall = document.getElementById("paywall");
+
+  loginWrapper.style.display = "none";
+  paywall.style.display = "none";
+
+  if (!gerou) return;
+
+  // 1ª prioridade: não logado → força login
+  if (!logged) {
+    loginWrapper.style.display = "block";
+    paywall.style.display = "none"; // garante que paywall não apareça
     return;
   }
 
-  creditos--;
-  document.getElementById("creditos").innerText = creditos;
-
-  document.getElementById("diag").innerText =
-`Seu risco hoje é ALTO.
-90% das pessoas erram exatamente neste ponto.`;
-
-  document.getElementById("sample").innerText =
-`Essa é apenas uma estrutura inicial.
-Ela mostra o caminho, mas ainda não evita os erros mais caros.`;
-
+  // 2ª prioridade: logado e sem créditos → paywall
   if (creditos <= 0) {
-    document.getElementById("paywall").style.display = "block";
+    paywall.style.display = "block";
   }
-};
+  // Caso contrário: logado + créditos > 0 → full access, nada aparece
+}
 
-// A UNICA MUDANÇA: Agora envia o Token de autenticação pro server.js não dar erro
-document.getElementById("comprar").onclick = async () => {
+document.getElementById("gerar").onclick = async () => {
+  const produto = document.getElementById("produto").value.trim();
+  if (!produto) return alert("Digite o produto ou serviço");
+
+  gerou = true;
+  document.getElementById("resultado").style.display = "block";
+
+  // Reset visual
+  document.getElementById("diagnostico").innerText = "Analisando onde a maioria perde dinheiro…";
+  document.getElementById("impacto").innerText = "";
+  ['publico', 'angulo', 'imagem', 'copy', 'ctas'].forEach(id => {
+    document.getElementById(id).innerText = "";
+    document.getElementById(id).classList.add('blur');
+  });
+
   try {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("Por favor, faça login ou gere um diagnóstico primeiro para validar sua conta.");
-        return;
+    if (auth.currentUser) {
+      token = await auth.currentUser.getIdToken();
     }
 
-    const token = await user.getIdToken();
-    const res = await fetch(`${API}/api/pagamento`, {
+    const res = await fetch(`${API}/api/anuncio`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}` //
-      }
+        ...(token && { Authorization: `Bearer ${token}` })
+      },
+      body: JSON.stringify({ produto })
     });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText || "Erro no servidor");
+    }
 
     const data = await res.json();
 
+    document.getElementById("diagnostico").innerText =
+      `Seu risco agora é: ${data.resultado.risco}\n\n${data.resultado.causa}`;
+
+    document.getElementById("impacto").innerText = data.resultado.consequencia;
+
+    document.getElementById("publico").innerText = data.resultado.publico || "Disponível após login e créditos";
+    document.getElementById("angulo").innerText = data.resultado.angulo || "Disponível após login e créditos";
+    document.getElementById("imagem").innerText = data.resultado.imagem || "Disponível após login e créditos";
+    document.getElementById("copy").innerText = data.resultado.copy_base || "Versão básica focada em clareza.";
+    document.getElementById("ctas").innerText = data.resultado.ctas ? data.resultado.ctas.join('\n\n') : "Variações disponíveis após login e créditos";
+
+    if (data.acessoCompleto) {
+      ['publico', 'angulo', 'imagem', 'copy', 'ctas'].forEach(id => {
+        document.getElementById(id).classList.remove('blur');
+      });
+    }
+
+    creditos = data.creditosRestantes ?? creditos;
+    updateUI();
+
+  } catch (e) {
+    alert("Erro ao analisar: " + e.message);
+    console.error(e);
+  }
+};
+
+document.getElementById("loginCta").onclick = async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithPopup(auth, provider);
+    // onAuthStateChanged cuida do resto
+  } catch (err) {
+    alert("Erro no login: " + err.message);
+  }
+};
+
+document.getElementById("comprar").onclick = async () => {
+  if (!token) return alert("Faça login primeiro");
+  try {
+    const res = await fetch(`${API}/api/pagamento`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
     if (data.checkout_url) {
       window.location.href = data.checkout_url;
     } else {
-      alert("Erro ao gerar link de pagamento");
+      alert("Erro ao iniciar pagamento");
     }
   } catch (e) {
-    alert("Erro de conexão com pagamento");
+    alert("Erro no pagamento: " + e.message);
   }
 };
 </script>
