@@ -10,6 +10,8 @@ import { MercadoPagoConfig, Preference } from "mercadopago";
 
 dotenv.config();
 
+/* ================= SETUP ================= */
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -21,6 +23,7 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 /* ================= FIREBASE ADMIN ================= */
+
 let serviceAccount;
 const firebaseKeyPath = path.join(__dirname, "firebase-key.json");
 
@@ -44,9 +47,13 @@ try {
 const db = admin.firestore();
 
 /* ================= OPENAI ================= */
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 /* ================= MERCADOPAGO ================= */
+
 const mpClient = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
 });
@@ -65,34 +72,7 @@ app.get("/api/config", (req, res) => {
   });
 });
 
-/* ---------- CRÉDITOS (dá 1 inicial se novo) ---------- */
-app.get("/api/creditos", async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.json({ creditos: 0 });
-
-  try {
-    const token = authHeader.split(" ")[1];
-    const decoded = await admin.auth().verifyIdToken(token);
-    const uid = decoded.uid;
-
-    const userRef = db.collection("usuarios").doc(uid);
-    const snap = await userRef.get();
-
-    if (!snap.exists) {
-      await userRef.set({ creditos: 1, usouGratis: false });
-      return res.json({ creditos: 1 });
-    }
-
-    res.json({
-      creditos: snap.data().creditos || 0,
-    });
-  } catch (err) {
-    console.error("Erro ao buscar créditos:", err.message);
-    res.json({ creditos: 0 });
-  }
-});
-
-/* ---------- ANÚNCIO (DIAGNÓSTICO + FUNIL) ---------- */
+/* ---------- ANÚNCIO ---------- */
 app.post("/api/anuncio", async (req, res) => {
   const { produto } = req.body;
   if (!produto) {
@@ -101,7 +81,6 @@ app.post("/api/anuncio", async (req, res) => {
 
   let uid = null;
   let creditos = 0;
-  let acessoCompleto = false;
 
   const authHeader = req.headers.authorization;
   if (authHeader) {
@@ -111,134 +90,111 @@ app.post("/api/anuncio", async (req, res) => {
       uid = decoded.uid;
 
       const userDoc = await db.collection("usuarios").doc(uid).get();
-      if (userDoc.exists) {
-        creditos = userDoc.data().creditos || 0;
-        acessoCompleto = creditos > 0;
-      }
-    } catch (err) {
-      console.error("Erro auth:", err.message);
+      creditos = userDoc.exists ? userDoc.data().creditos || 0 : 0;
+    } catch {
+      uid = null;
+      creditos = 0;
     }
   }
+
+  const acessoCompleto = uid && creditos > 0;
 
   const prompt = `
 Produto: ${produto}
 
-Você é um especialista em anúncios pagos (Meta Ads / Google Ads) para microempreendedores brasileiros.
+Você é um especialista em anúncios pagos para microempreendedores.
 
-Responda APENAS com JSON válido, sem texto extra, sem markdown:
+Responda APENAS em JSON válido, no formato:
 
 {
-  "risco": "ALTO" | "MÉDIO" | "BAIXO",
-  "causa": "Explicação curta do erro comum que 90% cometem ao anunciar esse tipo de produto",
-  "consequencia": "Impacto real em R$: perda de verba, cliques errados, conversão baixa, etc.",
-  "publico": ${acessoCompleto ? `"Público-alvo específico (idade, gênero, dores principais, comportamentos)"` : `null`},
-  "angulo": ${acessoCompleto ? `"Ângulo emocional forte que conecta com a dor ou desejo do público"` : `null`},
-  "imagem": ${acessoCompleto ? `"Descrição clara e detalhada da imagem ideal para o anúncio (estilo, composição, cores, elementos)"` : `null`},
-  "copy_base": ${acessoCompleto ? `"Copy curta (3-6 linhas), persuasiva, tom brasileiro natural (pessoa pra pessoa), com emojis estratégicos e CTA forte"` : `"Versão básica grátis focada em clareza simples"`},
-  "ctas": ${acessoCompleto ? `["CTA para topo de funil (awareness)", "CTA para meio de funil (consideração)", "CTA para fundo de funil (conversão)"]` : `null`}
+  "risco": "ALTO | MÉDIO | BAIXO",
+  "porque": "Explique claramente por que esse produto corre esse risco ao anunciar.",
+  "impacto": "Explique o impacto real disso em dinheiro, cliques errados ou falta de conversão.",
+  "copy": ${acessoCompleto ? `"Gere uma copy curta, persuasiva e direta sobre esse produto."` : `null`}
 }
+
+Regras:
+- Seja específico
+- Nada genérico
+- Linguagem simples e direta
 `;
 
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "Responda SOMENTE JSON válido." },
+        {
+          role: "system",
+          content:
+            "Você age como um estrategista de tráfego pago focado em reduzir desperdício.",
+        },
         { role: "user", content: prompt },
       ],
-      temperature: 0.7,
     });
 
-    let raw = completion.choices[0].message.content.trim();
-    raw = raw.replace(/```json|```/g, "").trim();
+    const raw = completion.choices[0].message.content;
     const data = JSON.parse(raw);
 
-    if (acessoCompleto && uid) {
-      await db.collection("usuarios").doc(uid).update({
-        creditos: admin.firestore.FieldValue.increment(-1)
-      });
+    if (acessoCompleto) {
+      await db
+        .collection("usuarios")
+        .doc(uid)
+        .set({ creditos: creditos - 1 }, { merge: true });
       creditos -= 1;
     }
 
-    res.json({
-      resultado: {
-        risco: data.risco,
-        causa: data.causa,
-        consequencia: data.consequencia,
-        publico: data.publico,
-        angulo: data.angulo,
-        imagem: data.imagem,
-        copy_base: data.copy_base,
-        ctas: data.ctas
-      },
-      creditosRestantes: creditos,
-      acessoCompleto
-    });
+  res.json({
+  resultado: {
+    risco: data.risco,
+    causa: data.porque,
+    consequencia: data.impacto,
+    copy_base: data.copy || null,
+  },
+  creditosRestantes: creditos,
+});
+
   } catch (err) {
     console.error("❌ Erro IA:", err.message);
     res.status(500).json({ erro: "Erro ao gerar diagnóstico" });
   }
 });
 
-/* ---------- PAGAMENTO (Preference) ---------- */
+/* ---------- PAGAMENTO ---------- */
 app.post("/api/pagamento", async (req, res) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    console.log("Sem Authorization header");
-    return res.status(401).json({ erro: "Não autenticado" });
-  }
+  if (!authHeader) return res.status(401).json({ erro: "Não autenticado" });
 
   try {
     const token = authHeader.split(" ")[1];
-    console.log("Token recebido (início):", token.substring(0, 20) + "...");
-
     const decoded = await admin.auth().verifyIdToken(token);
     const uid = decoded.uid;
-    console.log(`Usuário autenticado: ${uid}`);
 
     const preference = new Preference(mpClient);
 
-    console.log("Criando preference no Mercado Pago...");
-
-    const response = await preference.create({
-      body: {
-        items: [
-          {
-            id: "pack-10",
-            title: "Pack 10 Créditos Tilápia IA",
-            quantity: 1,
-            unit_price: 7.99,
-            currency_id: "BRL",
-          },
-        ],
-        metadata: { uid },
-        // auto_return removido para evitar erro de validação em testes
-        back_urls: {
-          success: "http://localhost:3000/success",   // ajuste se seu frontend roda em outra porta
-          failure: "http://localhost:3000/failure",
-          pending: "http://localhost:3000/pending"
+    const body = {
+      items: [
+        {
+          id: "pack-10",
+          title: "Pack 10 Créditos Hucks IA",
+          quantity: 1,
+          unit_price: 7.99,
+          currency_id: "BRL",
         },
-        // notification_url: "https://therux-backend.onrender.com/api/webhook/mp"  // descomente quando tiver webhook
-      },
-    });
+      ],
+      metadata: { uid },
+      auto_return: "approved",
+    };
 
-    console.log("Success! Preference ID:", response.id);
-    console.log("Checkout URL:", response.init_point);
-
+    const response = await preference.create({ body });
     res.json({ checkout_url: response.init_point });
   } catch (err) {
-    console.error("❌ ERRO GRAVE NA ROTA PAGAMENTO:");
-    console.error("Mensagem:", err.message);
-    console.error("Stack:", err.stack || "sem stack");
-    if (err.cause) console.error("Causa:", err.cause);
-    res.status(500).json({ 
-      erro: "Erro interno ao criar pagamento",
-      detalhes: err.message 
-    });
+    console.error("❌ Erro MP:", err.message);
+    res.status(500).json({ erro: "Erro no pagamento" });
   }
 });
 
 /* ================= START ================= */
+
 app.listen(PORT, () => {
   console.log(`🔥 Backend rodando em http://localhost:${PORT}`);
 });

@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tilápia IA — Evite Anúncios Errados</title>
+<title>Hucks IA — Diagnóstico de Anúncios</title>
 
 <style>
 :root{
   --bg:#020617;
+  --card:#0f172a;
   --primary:#6366f1;
   --accent:#a855f7;
   --danger:#f97316;
@@ -17,7 +18,7 @@ body{
   margin:0;
   min-height:100vh;
   background:radial-gradient(circle at top,#020617,#000);
-  font-family:system-ui;
+  font-family:Inter,system-ui,sans-serif;
   color:#e5e7eb;
   display:flex;
   align-items:center;
@@ -25,19 +26,14 @@ body{
 }
 .container{
   width:100%;
-  max-width:560px;
+  max-width:520px;
   background:#020617;
   border:1px solid #1e293b;
   border-radius:22px;
   padding:28px;
 }
-h1{text-align:center;margin:0 0 6px}
-.sub{
-  text-align:center;
-  font-size:13px;
-  color:#94a3b8;
-  margin-bottom:22px;
-}
+h1{text-align:center;margin:0 0 8px;font-size:2rem}
+.sub{text-align:center;font-size:13px;color:#94a3b8;margin-bottom:24px}
 input,button{
   width:100%;
   padding:16px;
@@ -50,7 +46,7 @@ input,button{
 button{
   margin-top:14px;
   border:none;
-  font-weight:800;
+  font-weight:700;
   cursor:pointer;
   background:linear-gradient(135deg,var(--primary),var(--accent));
 }
@@ -59,7 +55,7 @@ button{
   font-size:12px;
   text-transform:uppercase;
   font-weight:800;
-  margin-bottom:6px;
+  margin-bottom:8px;
 }
 .box{
   background:#020617;
@@ -67,110 +63,56 @@ button{
   border-left:5px solid var(--primary);
   border-radius:14px;
   padding:16px;
-  margin-bottom:14px;
+  margin-bottom:18px;
   white-space:pre-wrap;
 }
 .risk{border-left-color:var(--danger)}
-.blur{filter:blur(6px);opacity:.5}
-
-.login-cta{
-  display:none;
-  margin-top:16px;
-}
-.login-cta button{
-  background:transparent;
-  border:1px dashed #6366f1;
-  font-weight:800;
-}
-
+.blur{filter:blur(5px);opacity:.6}
 .paywall{
-  display:none;
   margin-top:18px;
   background:linear-gradient(135deg,#4f46e5,#7c3aed);
   padding:18px;
   border-radius:14px;
   text-align:center;
+  display:none;
 }
-.paywall p{
-  font-size:14px;
-  margin:0 0 12px;
-}
-.paywall button{
-  background:#fff;
-  color:#000;
-  font-weight:900;
-}
-
-.footer{
-  font-size:11px;
-  color:#94a3b8;
-  text-align:right;
-}
+.paywall button{background:#fff;color:#000}
+.footer{text-align:right;font-size:11px;color:#94a3b8}
 </style>
 </head>
 
 <body>
 <div class="container">
-  <h1>Hucks IA</h1>
-  <div class="sub">
-    90% das pessoas erram isso em anúncios.<br>
-    Descubra antes de perder dinheiro.
-  </div>
+  <h1>tilapina IA</h1>
+  <div class="sub">Descubra onde você está prestes a perder dinheiro em anúncios.</div>
 
-  <input id="produto" placeholder="Ex: Bolo de pote, Curso de inglês, Manicure em domicílio"/>
-  <button id="gerar">🧠 Gerar diagnóstico (1 tentativa grátis)</button>
+  <input id="produto" placeholder="Ex: Bolo de Pote, Curso de Inglês"/>
+  <button id="gerar">✨ Gerar Diagnóstico Seguro</button>
 
   <div id="resultado" class="section">
-
-    <div class="label">⚠️ Seu risco agora</div>
+    <div class="label">⚠️ Diagnóstico de Risco</div>
     <div id="diagnostico" class="box risk"></div>
 
-    <div class="label">💸 Impacto real</div>
+    <div class="label">💸 Impacto Real</div>
     <div id="impacto" class="box"></div>
 
-    <div class="label">👥 Público-alvo específico</div>
-    <div id="publico" class="box blur"></div>
-
-    <div class="label">😢 Ângulo emocional</div>
-    <div id="angulo" class="box blur"></div>
-
-    <div class="label">🖼️ Imagem ideal (descrição)</div>
-    <div id="imagem" class="box blur"></div>
-
-    <div class="label">✍️ Texto de anúncio (pessoa → pessoa)</div>
+    <div class="label">✍️ Copy Base</div>
     <div id="copy" class="box blur"></div>
 
-    <div class="label">📞 CTAs variados pro funil</div>
-    <div id="ctas" class="box blur"></div>
-
-    <!-- LOGIN CTA -->
-    <div class="login-cta" id="loginCtaWrapper">
-      <button id="loginCta">
-        🔐 Entre para continuar evitando erros
-                (recarregue ao logar)
-      </button>
-    </div>
-
-    <!-- PAYWALL -->
     <div class="paywall" id="paywall">
-      <p>
-        Cada crédito é <b>uma tentativa de não perder dinheiro</b>.<br><br>
-        Continue com clareza total e redução de erros caros.
-      </p>
-      <button id="comprar">
-        💳 Pacote com 10 créditos apenas R$7,99
-      </button>
+      <p>🔒 Desbloqueie a copy completa antes de anunciar errado.</p>
+      <button id="comprar">Comprar Créditos</button>
     </div>
 
     <div class="footer">
-      Saldo: <b><span id="creditos">1</span></b> crédito
+      Saldo: <b><span id="creditos">0</span></b> créditos
     </div>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const API = location.hostname.includes("localhost")
   ? "http://localhost:3001"
@@ -178,147 +120,78 @@ const API = location.hostname.includes("localhost")
 
 let auth;
 let token = null;
-let creditos = 1;      // Valor inicial presumido para não-logados
-let gerou = false;
 
-async function start() {
+async function startApp() {
   const res = await fetch(`${API}/api/config`);
   const config = await res.json();
-  auth = getAuth(initializeApp(config));
-
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      token = await user.getIdToken();
-      const resCred = await fetch(`${API}/api/creditos`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await resCred.json();
-      creditos = data.creditos;
-      document.getElementById("creditos").innerText = creditos;
-    } else {
-      creditos = 1;
-      document.getElementById("creditos").innerText = "1 (grátis)";
-    }
-    updateUI();
-  });
+  const app = initializeApp(config);
+  auth = getAuth(app);
 }
-start();
-
-function updateUI() {
-  const logged = !!auth.currentUser;
-
-  document.getElementById("creditos").innerText = logged ? creditos : "1 (grátis)";
-
-  const loginWrapper = document.getElementById("loginCtaWrapper");
-  const paywall = document.getElementById("paywall");
-
-  loginWrapper.style.display = "none";
-  paywall.style.display = "none";
-
-  if (!gerou) return;
-
-  // 1ª prioridade: não logado → força login
-  if (!logged) {
-    loginWrapper.style.display = "block";
-    paywall.style.display = "none"; // garante que paywall não apareça
-    return;
-  }
-
-  // 2ª prioridade: logado e sem créditos → paywall
-  if (creditos <= 0) {
-    paywall.style.display = "block";
-  }
-  // Caso contrário: logado + créditos > 0 → full access, nada aparece
-}
+startApp();
 
 document.getElementById("gerar").onclick = async () => {
-  const produto = document.getElementById("produto").value.trim();
-  if (!produto) return alert("Digite o produto ou serviço");
+  const produto = document.getElementById("produto").value;
+  if (!produto) return alert("Digite o produto");
 
-  gerou = true;
   document.getElementById("resultado").style.display = "block";
-
-  // Reset visual
-  document.getElementById("diagnostico").innerText = "Analisando onde a maioria perde dinheiro…";
+  document.getElementById("diagnostico").innerText = "Analisando risco...";
   document.getElementById("impacto").innerText = "";
-  ['publico', 'angulo', 'imagem', 'copy', 'ctas'].forEach(id => {
-    document.getElementById(id).innerText = "";
-    document.getElementById(id).classList.add('blur');
+  document.getElementById("copy").innerText = "";
+
+  // Pega o token do usuário se estiver logado
+  const user = auth.currentUser;
+  if (user) token = await user.getIdToken();
+
+  // 🔑 Chamada ao backend para gerar o diagnóstico
+  const res = await fetch(`${API}/api/anuncio`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` })
+    },
+    body: JSON.stringify({ produto })
   });
 
-  try {
-    if (auth.currentUser) {
-      token = await auth.currentUser.getIdToken();
-    }
+  const data = await res.json();
+  console.log("RESPOSTA API:", data);
 
-    const res = await fetch(`${API}/api/anuncio`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` })
-      },
-      body: JSON.stringify({ produto })
-    });
+  // Atualiza o DOM com os dados corretos
+  document.getElementById("diagnostico").innerText =
+`Risco: ${data.resultado.risco}
 
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(errText || "Erro no servidor");
-    }
+Por que isso é um problema:
+${data.resultado.causa}`;
 
-    const data = await res.json();
+  document.getElementById("impacto").innerText =
+`Impacto real:
+${data.resultado.consequencia}`;
 
-    document.getElementById("diagnostico").innerText =
-      `Seu risco agora é: ${data.resultado.risco}\n\n${data.resultado.causa}`;
-
-    document.getElementById("impacto").innerText = data.resultado.consequencia;
-
-    document.getElementById("publico").innerText = data.resultado.publico || "Disponível após login e créditos";
-    document.getElementById("angulo").innerText = data.resultado.angulo || "Disponível após login e créditos";
-    document.getElementById("imagem").innerText = data.resultado.imagem || "Disponível após login e créditos";
-    document.getElementById("copy").innerText = data.resultado.copy_base || "Versão básica focada em clareza.";
-    document.getElementById("ctas").innerText = data.resultado.ctas ? data.resultado.ctas.join('\n\n') : "Variações disponíveis após login e créditos";
-
-    if (data.acessoCompleto) {
-      ['publico', 'angulo', 'imagem', 'copy', 'ctas'].forEach(id => {
-        document.getElementById(id).classList.remove('blur');
-      });
-    }
-
-    creditos = data.creditosRestantes ?? creditos;
-    updateUI();
-
-  } catch (e) {
-    alert("Erro ao analisar: " + e.message);
-    console.error(e);
+  if (data.resultado.copy_base) {
+    document.getElementById("copy").innerText = data.resultado.copy_base;
+    document.getElementById("copy").classList.remove("blur");
+    document.getElementById("paywall").style.display = "none";
+  } else {
+    document.getElementById("copy").innerText =
+      "Essa é apenas uma amostra. A versão completa mostra exatamente o que mudar antes de anunciar.";
+    document.getElementById("copy").classList.add("blur");
+    document.getElementById("paywall").style.display = "block";
   }
-};
 
-document.getElementById("loginCta").onclick = async () => {
-  const provider = new GoogleAuthProvider();
-  try {
-    await signInWithPopup(auth, provider);
-    // onAuthStateChanged cuida do resto
-  } catch (err) {
-    alert("Erro no login: " + err.message);
-  }
+  document.getElementById("creditos").innerText =
+    data.creditosRestantes ?? "0";
 };
 
 document.getElementById("comprar").onclick = async () => {
-  if (!token) return alert("Faça login primeiro");
-  try {
-    const res = await fetch(`${API}/api/pagamento`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-    if (data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      alert("Erro ao iniciar pagamento");
-    }
-  } catch (e) {
-    alert("Erro no pagamento: " + e.message);
-  }
+  if (!auth.currentUser) return alert("Faça login para continuar");
+
+  const token = await auth.currentUser.getIdToken();
+  const res = await fetch(`${API}/api/pagamento`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const data = await res.json();
+  if (data.checkout_url) location.href = data.checkout_url;
 };
 </script>
 </body>
